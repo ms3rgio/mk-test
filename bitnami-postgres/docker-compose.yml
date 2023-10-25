@@ -1,0 +1,38 @@
+# Copyright VMware, Inc.
+# SPDX-License-Identifier: APACHE-2.0
+
+version: '2'
+
+services:
+  pg-master-bitnami:
+    image: docker.io/bitnami/postgresql:latest
+    ports:
+      - '5432'
+    volumes:
+      - 'postgresql_master_data:/bitnami/postgresql'
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=master
+      - POSTGRESQL_REPLICATION_USER=repl_user
+      - POSTGRESQL_REPLICATION_PASSWORD=repl_password
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=my_password
+      - POSTGRESQL_DATABASE=testdb
+      - ALLOW_EMPTY_PASSWORD=yes
+  pg-replica-bitnami:
+    image: docker.io/bitnami/postgresql:latest
+    ports:
+      - '5432'
+    depends_on:
+      - pg-master-bitnami
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=slave
+      - POSTGRESQL_REPLICATION_USER=repl_user
+      - POSTGRESQL_REPLICATION_PASSWORD=repl_password
+      - POSTGRESQL_MASTER_HOST=pg-master-bitnami
+      - POSTGRESQL_PASSWORD=my_password
+      - POSTGRESQL_MASTER_PORT_NUMBER=5432
+      - ALLOW_EMPTY_PASSWORD=yes
+
+volumes:
+  postgresql_master_bitnami_data:
+    driver: local
