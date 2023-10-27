@@ -1,4 +1,4 @@
-# mk-test
+# ck-test
 
 ## How to execute
 
