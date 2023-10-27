@@ -1,0 +1,44 @@
+version: '3.1'
+services:
+  pg-master:
+    image: postgres:latest
+    healthcheck:
+      # test: ["CMD-SHELL", "pg_isready -U postgres"]
+      # test: ["CMD-SHELL", "bash -c 'printf \"GET / HTTP/1.1\n\n\" > /dev/tcp/127.0.0.1/5432; exit $?;'"]
+      test: ["CMD-SHELL", bash -c "exec 6<> /dev/tcp/localhost/5432"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    container_name: pg-master
+    environment:
+      POSTGRES_PASSWORD: pg1234
+      POSTGRES_DB: testdb
+    command: [ "postgres", "-c", "wal_level=logical" ]
+    volumes:
+      - postgres-master-data:/var/lib/postgresql/data
+      - ./scripts_master:/docker-entrypoint-initdb.d
+      - ./maintenance:/maintenance
+    ports:
+      - '5432'
+
+  pg-replica:
+    image: postgres:latest
+    container_name: pg-replica
+    environment:
+      POSTGRES_PASSWORD: pg1234
+      POSTGRES_DB: testdb
+    command: [ "postgres", "-c", "wal_level=logical" ]
+    volumes:
+      - postgres-replica-data:/var/lib/postgresql/data
+      - ./scripts_replicas:/docker-entrypoint-initdb.d
+      - ./maintenance:/maintenance
+    ports:
+      - '5432'
+    depends_on:
+      pg-master:
+        condition: service_healthy
+    restart: always
+
+volumes:
+  postgres-master-data:
+  postgres-replica-data:

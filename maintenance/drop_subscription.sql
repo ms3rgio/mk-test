@@ -1,0 +1,1 @@
+drop subscription sub_orders cascade;

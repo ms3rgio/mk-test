@@ -1,0 +1,1 @@
+drop publication orders_publication;

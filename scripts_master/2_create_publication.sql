@@ -1,0 +1,1 @@
+CREATE PUBLICATION orders_publication FOR TABLE orders;
