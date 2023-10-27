@@ -1,4 +1,4 @@
-# ck-test
+# cloudwalk-test
 
 ## How to execute
 
